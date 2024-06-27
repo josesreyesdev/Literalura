@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public record Book(
+public record BookData(
         @JsonAlias("id") Long id,
         @JsonAlias("title") String title,
-        @JsonAlias("authors") List<Author> authors,
+        @JsonAlias("authors") List<AuthorData> authors,
         @JsonAlias("subjects") List<String> subjects,
         @JsonAlias("bookshelves") List<String> bookshelves,
         @JsonAlias("languages") List<String> languages,

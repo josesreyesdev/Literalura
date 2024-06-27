@@ -10,5 +10,5 @@ public record ResponseData(
         @JsonAlias("count") Long count,
         @JsonAlias("next") String next,
         @JsonAlias("previous") String previous,
-        @JsonAlias("results")List<Book> results
+        @JsonAlias("results")List<BookData> results
 ) { }

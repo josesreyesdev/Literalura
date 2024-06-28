@@ -11,7 +11,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -46,19 +45,7 @@ public class Response {
                 ))
                 .collect(Collectors.toList()); */
         // Ejemplo con flatMap en autores si fuera necesario
-        bookList = data.results().stream()
-                .flatMap(b -> b.authors().stream()
-                        .map(a -> new Book(
-                                b.id(), b.title(), Collections.singletonList(new Author(
-                                a.name(),
-                                a.birthYear(),
-                                a.deathYear()
-                        )),
-                                b.subjects(), b.bookshelves(), b.languages(),
-                                b.copyright(), b.mediaType(), b.formats(), b.downloadCount()
-                        ))
-                )
-                .collect(Collectors.toList());
+        bookList = data.results().stream().flatMap(b -> b.authors().stream().map(a -> new Book(b.id(), b.title(), Collections.singletonList(new Author(a.name(), a.birthYear(), a.deathYear())), b.subjects(), b.bookshelves(), b.languages(), b.copyright(), b.mediaType(), b.formats(), b.downloadCount()))).collect(Collectors.toList());
 
 
         System.out.println();

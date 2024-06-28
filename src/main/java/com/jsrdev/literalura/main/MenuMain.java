@@ -1,25 +1,64 @@
 package com.jsrdev.literalura.main;
 
-import com.jsrdev.literalura.model.response.ResponseData;
-import com.jsrdev.literalura.service.ApiService;
-import com.jsrdev.literalura.service.ConvertData;
-import com.jsrdev.literalura.utils.Constants;
+import java.util.Scanner;
 
 public class MenuMain {
-    private final ApiService service = new ApiService();
-    private final ConvertData convertData = new ConvertData();
 
-    String baseUrl = Constants.BASE_URL;
+    private final Scanner scanner = new Scanner(System.in);
+    Response response = new Response();
 
     public void showMenu() {
-        String url = baseUrl + "books/";
-        var json = service.getData(url);
-        System.out.println();
-        System.out.println("Response => " + json);
 
-        var books = convertData.getData(json, ResponseData.class);
+        var option = -1;
+        while (option != 0) {
+            var menu = """
+                     Elija la opción que desee realizar, a través del número:
+                     1.- Buscar Libro por Título.
+                     2.- Listar Libros registrados.
+                     3.- Listar Autores registrados.
+                     4.- Listar Autores vivos en un determinado año.
+                     5.- Listar Libros por Idioma.
+                    \s
+                     0. Salir;
+                    \s""";
 
-        System.out.println();
-        books.results().forEach(System.out::println);
+            System.out.println();
+            System.out.println(menu);
+
+            // Verifica si hay un entero disponible para leer
+            while (!scanner.hasNextInt()) {
+                System.out.println("Entrada inválida. Introduce un número entero válido:");
+                scanner.nextLine(); // Limpiar el buffer de entrada
+            }
+
+            option = scanner.nextInt();
+            scanner.nextLine();
+
+            System.out.println();
+            switch (option) {
+                case 1:
+                    response.getBookByTitle();
+                    break;
+                case 2:
+                    response.fetchResponseData();
+                    break;
+                case 3:
+                    response.getAuthors();
+                    break;
+                case 4:
+                    response.getAuthorsBirthYearByYear();
+                    break;
+                case 5:
+                    response.getBooksByIdiom();
+                    break;
+                case 0:
+                    System.out.println("Closed application");
+                    break;
+                default:
+                    System.out.println("Invalid Option, Try Again!");
+            }
+        }
+
     }
+
 }

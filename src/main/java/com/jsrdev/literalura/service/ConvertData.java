@@ -12,6 +12,7 @@ public class ConvertData implements IConvertData{
         try {
             return objectMapper.readValue(json, genericClass);
         } catch (JsonProcessingException e) {
+            System.out.println(e.getMessage() + " no he podido deserealizar el json");
             throw new RuntimeException(e);
         }
     }

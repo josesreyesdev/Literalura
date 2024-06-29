@@ -32,21 +32,7 @@ public class Response {
         var data = convertData.getData(json, ResponseData.class);
 
         // Convert ResponseData to a Book
-        /*bookList = data.results().stream().
-                map(b -> new Book(
-                        b.id(), b.title(), b.authors().stream()
-                        .map(a -> new Author(
-                                a.name(),
-                                a.birthYear(),
-                                a.deathYear()
-                        )).collect(Collectors.toList()),
-                        b.subjects(), b.bookshelves(), b.languages(),
-                        b.copyright(), b.mediaType(), b.formats(), b.downloadCount()
-                ))
-                .collect(Collectors.toList()); */
-        // Ejemplo con flatMap en autores si fuera necesario
-        bookList = data.results().stream().flatMap(b -> b.authors().stream().map(a -> new Book(b.id(), b.title(), Collections.singletonList(new Author(a.name(), a.birthYear(), a.deathYear())), b.subjects(), b.bookshelves(), b.languages(), b.copyright(), b.mediaType(), b.formats(), b.downloadCount()))).collect(Collectors.toList());
-
+        bookList = getConvertResponseDataToABook(data);
 
         System.out.println();
         bookList.forEach(System.out::println);
@@ -86,16 +72,51 @@ public class Response {
 
     }
 
-    public void getAuthorsBirthYearByYear() {
+    public void getBirthYearAuthorsByYear() {
 
     }
 
-    public void getBooksByIdiom() {
+    public void getBooksByLanguage() {
+        var language = "es";
+        String url = baseUrl + "books/?languages=" + language;
 
+        var json = service.getData(url);
+        var data = convertData.getData(json, ResponseData.class);
+
+        // Convert ResponseData to a Book
+        bookList = getConvertResponseDataToABook(data);
+
+        System.out.println();
+        System.out.println("-------- Libros encontrados del Idioma - " + language.toUpperCase() +"  ------------");
+        bookList.forEach(b -> System.out.println("Title: => " + b.getTitle()));
     }
 
     private String encodeAndFormatBookName(String bookName) {
         String encodedBookName = URLEncoder.encode(bookName, StandardCharsets.UTF_8);
         return encodedBookName.replace("+", "%20");
+    }
+
+    private List<Book> getConvertResponseDataToABook(ResponseData data) {
+        /*bookList = data.results().stream().
+                map(b -> new Book(
+                        b.id(), b.title(), b.authors().stream()
+                        .map(a -> new Author(
+                                a.name(),
+                                a.birthYear(),
+                                a.deathYear()
+                        )).collect(Collectors.toList()),
+                        b.subjects(), b.bookshelves(), b.languages(),
+                        b.copyright(), b.mediaType(), b.formats(), b.downloadCount()
+                ))
+                .collect(Collectors.toList()); */
+        return data.results().stream()
+                .flatMap(b -> b.authors().stream()
+                        .map(a -> new Book(
+                                b.id(), b.title(),
+                                Collections.singletonList(new Author(a.name(), a.birthYear(), a.deathYear())),
+                                b.subjects(), b.bookshelves(), b.languages(),
+                                b.copyright(), b.mediaType(), b.formats(),
+                                b.downloadCount())))
+                .collect(Collectors.toList());
     }
 }

@@ -37,19 +37,19 @@ public class MenuMain {
             System.out.println();
             switch (option) {
                 case 1:
-                    response.getBookByTitle();
+                    response.fetchResponseData();
                     break;
                 case 2:
-                    response.fetchResponseData();
+                    response.getBookByTitle();
                     break;
                 case 3:
                     response.getAuthors();
                     break;
                 case 4:
-                    response.getAuthorsBirthYearByYear();
+                    response.getBirthYearAuthorsByYear();
                     break;
                 case 5:
-                    response.getBooksByIdiom();
+                    response.getBooksByLanguage();
                     break;
                 case 0:
                     System.out.println("Closed application");

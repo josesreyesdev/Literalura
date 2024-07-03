@@ -1,7 +1,11 @@
 package com.jsrdev.literalura.model;
 
+import com.jsrdev.literalura.model.response.AuthorData;
+import com.jsrdev.literalura.model.response.BookData;
+
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Book {
     private Long id;
@@ -15,28 +19,18 @@ public class Book {
     private Map<String, String> formats;
     private Integer downloadCount;
 
-    public Book(
-            Long id,
-            String title,
-            List<Author> authors,
-            List<String> subjects,
-            List<String> bookshelves,
-            List<String> languages,
-            boolean copyright,
-            String mediaType,
-            Map<String, String> formats,
-            int downloadCount) {
-
-        this.id = id;
-        this.title = title;
-        this.authors = authors;
-        this.subjects = subjects;
-        this.bookshelves = bookshelves;
-        this.languages = languages;
-        this.copyright = copyright;
-        this.mediaType = mediaType;
-        this.formats = formats;
-        this.downloadCount = downloadCount;
+    public Book(BookData bookData) {
+        this.id = bookData.id();
+        this.title = bookData.title();
+        this.authors = convertBookDataToABook(bookData.authors());
+        this.subjects = bookData.subjects();
+        this.bookshelves = bookData.bookshelves();
+        this.languages = bookData.languages();
+        this.copyright = bookData.copyright();
+        this.mediaType = bookData.mediaType();
+        this.formats = bookData.formats();
+        this.downloadCount = bookData.downloadCount();
+        ;
     }
 
     public String getTitle() {
@@ -45,17 +39,16 @@ public class Book {
 
     @Override
     public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", authors=" + authors +
-                ", subjects=" + subjects +
-                ", bookshelves=" + bookshelves +
-                ", languages=" + languages +
-                ", copyright=" + copyright +
-                ", mediaType='" + mediaType + '\'' +
-                ", formats=" + formats +
-                ", downloadCount=" + downloadCount +
-                '}';
+        return "Book{" + "id=" + id + ", title='" + title + '\'' + ", authors=" + authors + ", subjects=" + subjects + ", bookshelves=" + bookshelves + ", languages=" + languages + ", copyright=" + copyright + ", mediaType='" + mediaType + '\'' + ", formats=" + formats + ", downloadCount=" + downloadCount + '}';
+    }
+
+    private List<Author> convertBookDataToABook(List<AuthorData> authors) {
+        return authors.stream()
+                .map(a -> new Author(new AuthorData(
+                        a.name(),
+                        a.birthYear(),
+                        a.deathYear()
+                )))
+                .collect(Collectors.toList());
     }
 }

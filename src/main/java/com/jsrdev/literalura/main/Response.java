@@ -1,7 +1,8 @@
 package com.jsrdev.literalura.main;
 
-import com.jsrdev.literalura.model.Author;
 import com.jsrdev.literalura.model.Book;
+import com.jsrdev.literalura.model.response.AuthorData;
+import com.jsrdev.literalura.model.response.BookData;
 import com.jsrdev.literalura.model.response.ResponseData;
 import com.jsrdev.literalura.service.ApiService;
 import com.jsrdev.literalura.service.ConvertData;
@@ -9,7 +10,6 @@ import com.jsrdev.literalura.utils.Constants;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -25,7 +25,7 @@ public class Response {
 
     List<Book> bookList;
 
-    public void fetchResponseData() {
+    public void getBooksFromAPI() {
         String url = baseUrl + "books/";
         var json = service.getData(url);
 
@@ -34,18 +34,20 @@ public class Response {
         // Convert ResponseData to a Book
         bookList = getConvertResponseDataToABook(data);
 
-        System.out.println();
-        bookList.forEach(System.out::println);
+        //System.out.println();
+        //bookList.forEach(System.out::println);
 
         //mostrar solo titulos de los libros
         System.out.println();
         System.out.println("------------ Titulos de Libros encontrados -------------");
-        bookList.forEach(b -> System.out.println("Book => " + b.getTitle()));
+        for (int i = 0; i < bookList.size(); i++) {
+            System.out.println(i+1 + ".- Title: " + bookList.get(i).getTitle());
+        }
+        //bookList.forEach(b -> System.out.println("Book => " + b.getTitle()));
     }
 
-    public void getBookByTitle() {
+    public void getBookByTitleFromAPI() {
         //Crime and Punishment, Dracula, Don Quijote
-
         System.out.println("Ingresa el nombre del Libro que deseas ver:");
         var bookName = scanner.nextLine().trim();
 
@@ -55,7 +57,14 @@ public class Response {
         var data = convertData.getData(json, ResponseData.class);
 
         System.out.println();
-        data.results().forEach(b -> System.out.println("Title book: " + b.title()));
+        System.out.println("------------ BOOK ----------------");
+        data.results().forEach(b -> {
+            System.out.println("Title: " + b.title());
+            b.authors().forEach(a -> System.out.println("Author: " + a.name()));
+            System.out.println("Language: " + b.languages());
+            System.out.println("Download count: " + b.downloadCount());
+            System.out.println("********************************");
+        });
 
         /*Optional<Book> bookByTitle = bookList.stream()
                 .filter(b -> b.getTitle().toUpperCase().contains(bookName.toUpperCase()))
@@ -65,6 +74,10 @@ public class Response {
             var book = bookByTitle.get();
             System.out.println("Title => " + book.getTitle());
         } else System.out.println("No encontre el libro: " + bookName + ", intenta de nuevo!"); */
+
+    }
+
+    public void getBooksFromDB() {
 
     }
 
@@ -97,26 +110,25 @@ public class Response {
     }
 
     private List<Book> getConvertResponseDataToABook(ResponseData data) {
-        /*bookList = data.results().stream().
-                map(b -> new Book(
-                        b.id(), b.title(), b.authors().stream()
-                        .map(a -> new Author(
-                                a.name(),
-                                a.birthYear(),
-                                a.deathYear()
-                        )).collect(Collectors.toList()),
-                        b.subjects(), b.bookshelves(), b.languages(),
-                        b.copyright(), b.mediaType(), b.formats(), b.downloadCount()
-                ))
-                .collect(Collectors.toList()); */
         return data.results().stream()
-                .flatMap(b -> b.authors().stream()
-                        .map(a -> new Book(
-                                b.id(), b.title(),
-                                Collections.singletonList(new Author(a.name(), a.birthYear(), a.deathYear())),
-                                b.subjects(), b.bookshelves(), b.languages(),
-                                b.copyright(), b.mediaType(), b.formats(),
-                                b.downloadCount())))
+                .map(b -> new Book( new BookData(
+                        b.id(),
+                        b.title(),
+                        b.authors().stream()
+                                .map(a -> new AuthorData(
+                                        a.name(),
+                                        a.birthYear(),
+                                        a.deathYear()
+                                ))
+                                .collect(Collectors.toList()),
+                        b.subjects(),
+                        b.bookshelves(),
+                        b.languages(),
+                        b.copyright(),
+                        b.mediaType(),
+                        b.formats(),
+                        b.downloadCount()
+                )))
                 .collect(Collectors.toList());
     }
 }

@@ -13,11 +13,12 @@ public class MenuMain {
         while (option != 0) {
             var menu = """
                      Elija la opción que desee realizar, a través del número:
-                     1.- Buscar Libro por Título.
-                     2.- Listar Libros registrados.
-                     3.- Listar Autores registrados.
-                     4.- Listar Autores vivos en un determinado año.
-                     5.- Listar Libros por Idioma.
+                     1.- Consultar Libros desde la API
+                     2.- Buscar Libro por Título desde la API.
+                     3.- Listar Libros registrados en la BD.
+                     4.- Listar Autores registrados en la BD.
+                     5.- Listar Autores vivos en un determinado año de la BD.
+                     6.- Listar Libros por Idioma de la BD.
                     \s
                      0. Salir;
                     \s""";
@@ -37,18 +38,21 @@ public class MenuMain {
             System.out.println();
             switch (option) {
                 case 1:
-                    response.fetchResponseData();
+                    response.getBooksFromAPI();
                     break;
                 case 2:
-                    response.getBookByTitle();
+                    response.getBookByTitleFromAPI();
                     break;
                 case 3:
-                    response.getAuthors();
+                    response.getBooksFromDB();
                     break;
                 case 4:
-                    response.getBirthYearAuthorsByYear();
+                    response.getAuthors();
                     break;
                 case 5:
+                    response.getBirthYearAuthorsByYear();
+                    break;
+                case 6:
                     response.getBooksByLanguage();
                     break;
                 case 0:

@@ -1,5 +1,6 @@
 package com.jsrdev.literalura.main;
 
+import com.jsrdev.literalura.BookRepository;
 import com.jsrdev.literalura.model.Book;
 import com.jsrdev.literalura.model.response.AuthorData;
 import com.jsrdev.literalura.model.response.BookData;
@@ -25,6 +26,12 @@ public class Response {
 
     List<Book> bookList;
 
+    private final BookRepository repository;
+
+    public Response(BookRepository repository) {
+        this.repository = repository;
+    }
+
     public void getBooksFromAPI() {
         String url = baseUrl + "books/";
         var json = service.getData(url);
@@ -32,7 +39,7 @@ public class Response {
         var data = convertData.getData(json, ResponseData.class);
 
         // Convert ResponseData to a Book
-        bookList = getConvertResponseDataToABook(data);
+        bookList = ConvertResponseDataToBooks(data);
 
         //System.out.println();
         //bookList.forEach(System.out::println);
@@ -41,7 +48,7 @@ public class Response {
         System.out.println();
         System.out.println("------------ Titulos de Libros encontrados -------------");
         for (int i = 0; i < bookList.size(); i++) {
-            System.out.println(i+1 + ".- Title: " + bookList.get(i).getTitle());
+            System.out.println(i + 1 + ".- Title: " + bookList.get(i).getTitle());
         }
         //bookList.forEach(b -> System.out.println("Book => " + b.getTitle()));
     }
@@ -57,14 +64,18 @@ public class Response {
         var data = convertData.getData(json, ResponseData.class);
 
         System.out.println();
-        System.out.println("------------ BOOK ----------------");
-        data.results().forEach(b -> {
-            System.out.println("Title: " + b.title());
-            b.authors().forEach(a -> System.out.println("Author: " + a.name()));
-            System.out.println("Language: " + b.languages());
-            System.out.println("Download count: " + b.downloadCount());
-            System.out.println("********************************");
-        });
+        if (!data.results().isEmpty()) {
+
+            // Convert ResponseData to a Book
+            bookList = ConvertResponseDataToBooks(data);
+
+            bookList.forEach(book -> {
+                //Save in Db
+                repository.save(book);
+
+                showBooks(book);
+            });
+        } else System.out.println("No encontre Libros con este Título: " + bookName);
 
         /*Optional<Book> bookByTitle = bookList.stream()
                 .filter(b -> b.getTitle().toUpperCase().contains(bookName.toUpperCase()))
@@ -78,7 +89,11 @@ public class Response {
     }
 
     public void getBooksFromDB() {
+        bookList = repository.findAll();
 
+        if (!bookList.isEmpty()) {
+            bookList.stream().forEach(b -> showBooks(b));
+        } else System.out.println("No encontre libros registrados en la BD");
     }
 
     public void getAuthors() {
@@ -97,10 +112,10 @@ public class Response {
         var data = convertData.getData(json, ResponseData.class);
 
         // Convert ResponseData to a Book
-        bookList = getConvertResponseDataToABook(data);
+        bookList = ConvertResponseDataToBooks(data);
 
         System.out.println();
-        System.out.println("-------- Libros encontrados del Idioma - " + language.toUpperCase() +"  ------------");
+        System.out.println("-------- Libros encontrados del Idioma - " + language.toUpperCase() + "  ------------");
         bookList.forEach(b -> System.out.println("Title: => " + b.getTitle()));
     }
 
@@ -109,9 +124,9 @@ public class Response {
         return encodedBookName.replace("+", "%20");
     }
 
-    private List<Book> getConvertResponseDataToABook(ResponseData data) {
+    private List<Book> ConvertResponseDataToBooks(ResponseData data) {
         return data.results().stream()
-                .map(b -> new Book( new BookData(
+                .map(b -> new Book(new BookData(
                         b.id(),
                         b.title(),
                         b.authors().stream()
@@ -126,9 +141,18 @@ public class Response {
                         b.languages(),
                         b.copyright(),
                         b.mediaType(),
-                        b.formats(),
                         b.downloadCount()
                 )))
                 .collect(Collectors.toList());
+    }
+
+    private void showBooks(Book book) {
+        System.out.println();
+        System.out.println("------------ LIBRO ----------------");
+        System.out.println("Title: " + book.getTitle());
+        book.getAuthors().forEach(a -> System.out.println("Author: " + a.getName()));
+        System.out.println("Language: " + book.getLanguages());
+        System.out.println("Download count: " + book.getDownloadCount());
+        System.out.println("********************************");
     }
 }

@@ -1,13 +1,21 @@
 package com.jsrdev.literalura.main;
 
+import com.jsrdev.literalura.BookRepository;
+
 import java.util.Scanner;
 
 public class MenuMain {
 
+    private final BookRepository repository;
+
+    public MenuMain(BookRepository repository) {
+        this.repository = repository;
+    }
+
     private final Scanner scanner = new Scanner(System.in);
-    Response response = new Response();
 
     public void showMenu() {
+        Response response = new Response(repository);
 
         var option = -1;
         while (option != 0) {

@@ -30,7 +30,6 @@ public class Book {
         this.mediaType = bookData.mediaType();
         this.formats = bookData.formats();
         this.downloadCount = bookData.downloadCount();
-        ;
     }
 
     public String getTitle() {

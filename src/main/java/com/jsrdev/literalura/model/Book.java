@@ -54,16 +54,8 @@ public class Book {
         return authors;
     }
 
-    public List<String> getSubjects() {
-        return subjects;
-    }
-
     public List<String> getLanguages() {
         return languages;
-    }
-
-    public String getMediaType() {
-        return mediaType;
     }
 
     public Integer getDownloadCount() {

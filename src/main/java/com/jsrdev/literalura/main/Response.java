@@ -1,5 +1,7 @@
 package com.jsrdev.literalura.main;
 
+import com.jsrdev.literalura.model.Author;
+import com.jsrdev.literalura.repository.AuthorRepository;
 import com.jsrdev.literalura.repository.BookRepository;
 import com.jsrdev.literalura.model.Book;
 import com.jsrdev.literalura.model.response.AuthorData;
@@ -11,7 +13,9 @@ import com.jsrdev.literalura.utils.Constants;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
@@ -26,10 +30,12 @@ public class Response {
 
     List<Book> bookList;
 
-    private final BookRepository repository;
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
-    public Response(BookRepository repository) {
-        this.repository = repository;
+    public Response(BookRepository bookRepository, AuthorRepository authorRepository) {
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
     }
 
     public void getBooksFromAPI() {
@@ -69,11 +75,32 @@ public class Response {
             // Convert ResponseData to a Book
             bookList = ConvertResponseDataToBooks(data);
 
+            // Obtener autores asociados al libro y guardarlos si es necesario
+            List<Author> authors = new ArrayList<>();
+
             bookList.forEach(book -> {
 
-                if (repository.findBookById(book.getId()).isEmpty()) {
-                    //Save in Db
-                    repository.save(book);
+                if (bookRepository.findBookById(book.getId()).isEmpty()) {
+
+                    authors.addAll(book.getAuthors());
+
+                    authors.forEach(author -> {
+                        //verificar si el author ya existe en la BD
+                        Optional<Author> existingAuthor = authorRepository
+                                .findByNameContainsIgnoreCase(author.getName());
+
+                        if (existingAuthor.isEmpty()) {
+                            //Save Author in the BD
+                            authorRepository.save(author);
+                        } else {
+                            // solo asignar el id a la BD
+                            author.setId(existingAuthor.get().getId());
+                        }
+                    });
+
+                    //Save book in Db
+                    bookRepository.save(book);
+
                 } else System.out.println("El libro ya se encuentra la BD");
 
                 showBooks(book);
@@ -92,7 +119,7 @@ public class Response {
     }
 
     public void getBooksFromDB() {
-        bookList = repository.findAll();
+        bookList = bookRepository.findAll();
 
         if (!bookList.isEmpty()) {
             bookList.stream().forEach(b -> showBooks(b));
@@ -100,13 +127,12 @@ public class Response {
     }
 
     public void getAuthors() {
-        /*
-        * Muestra:
-        * Author: Names
-        * Fecha de Nacimiento: fecha
-        * Fecha de Fallecimiento: Fecha
-        * Libros: List[libros]
-        *  */
+
+        List<Author> authorList  = authorRepository.findAllAuthorsWithBooks();
+
+        if (!authorList.isEmpty()) {
+            showAuthors(authorList);
+        } else System.out.println("No encontre lista de autores");
     }
 
     public void getBirthYearAuthorsByYear() {
@@ -189,5 +215,25 @@ public class Response {
         System.out.println("Language: " + book.getLanguages());
         System.out.println("Download count: " + book.getDownloadCount());
         System.out.println("***********************************************************");
+    }
+
+    private void showAuthors(List<Author> authorList) {
+        authorList.forEach(author -> {
+            System.out.println();
+            System.out.println("************************** Authors **************************");
+            System.out.println("Authors: " + author.getName());
+            System.out.println("Fecha de Nacimiento: " + author.getBirthYear());
+            System.out.println("Fecha de Fallecimiento: " + author.getDeathYear());
+
+            // Obtener los títulos de los libros como una lista de Strings
+            List<String> bookTitles = author.getBooks().stream()
+                    .map(Book::getTitle) // Obtener el título de cada libro
+                    .collect(Collectors.toList());
+
+            // Imprimir los títulos de los libros como una lista
+            System.out.println("Libros: " + String.join(", ", bookTitles ));
+
+            System.out.println("**************************************************************");
+        });
     }
 }

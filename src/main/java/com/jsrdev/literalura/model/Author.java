@@ -3,6 +3,8 @@ package com.jsrdev.literalura.model;
 import com.jsrdev.literalura.model.response.AuthorData;
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity(name = "Author")
 @Table(name = "authors")
 public class Author {
@@ -19,6 +21,9 @@ public class Author {
     @Column(name = "death_year")
     private Integer deathYear;
 
+    @ManyToMany(mappedBy = "authors")
+    private List<Book> books;
+
     public Author(AuthorData author) {
         this.name = author.name();
         this.birthYear = author.birthYear();
@@ -26,6 +31,14 @@ public class Author {
     }
 
     public Author() {
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getName() {
@@ -38,6 +51,10 @@ public class Author {
 
     public Integer getDeathYear() {
         return deathYear;
+    }
+
+    public List<Book> getBooks() {
+        return books;
     }
 
     @Override

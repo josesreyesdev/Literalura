@@ -1,21 +1,24 @@
 package com.jsrdev.literalura.main;
 
+import com.jsrdev.literalura.repository.AuthorRepository;
 import com.jsrdev.literalura.repository.BookRepository;
 
 import java.util.Scanner;
 
 public class MenuMain {
 
-    private final BookRepository repository;
-
-    public MenuMain(BookRepository repository) {
-        this.repository = repository;
-    }
+    private final BookRepository bookRepository;
+    private final AuthorRepository authorRepository;
 
     private final Scanner scanner = new Scanner(System.in);
 
+    public MenuMain(BookRepository bookRepository, AuthorRepository authorRepository) {
+        this.bookRepository = bookRepository;
+        this.authorRepository = authorRepository;
+    }
+
     public void showMenu() {
-        Response response = new Response(repository);
+        Response response = new Response(bookRepository, authorRepository);
 
         var option = -1;
         while (option != 0) {

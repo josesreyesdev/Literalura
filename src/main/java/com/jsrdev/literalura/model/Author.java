@@ -1,12 +1,22 @@
 package com.jsrdev.literalura.model;
 
 import com.jsrdev.literalura.model.response.AuthorData;
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 
-@Embeddable
+@Entity(name = "Author")
+@Table(name = "authors")
 public class Author {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "author_id")
+    private Long id;
+
     private String name;
+
+    @Column(name = "birth_year")
     private Integer birthYear;
+
+    @Column(name = "death_year")
     private Integer deathYear;
 
     public Author(AuthorData author) {

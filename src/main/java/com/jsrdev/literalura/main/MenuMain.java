@@ -1,6 +1,6 @@
 package com.jsrdev.literalura.main;
 
-import com.jsrdev.literalura.BookRepository;
+import com.jsrdev.literalura.repository.BookRepository;
 
 import java.util.Scanner;
 

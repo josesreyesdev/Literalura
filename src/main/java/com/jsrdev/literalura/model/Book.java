@@ -11,24 +11,33 @@ import java.util.stream.Collectors;
 @Table(name = "books")
 public class Book {
     @Id
-    @Column(unique = true)
+    @Column(name = "book_id", unique = true)
     private Long id;
+
     private String title;
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "book_authors", joinColumns = @JoinColumn(name = "book_id"))
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "book_id")
     private List<Author> authors;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "book_subjects", joinColumns = @JoinColumn(name = "book_id"))
     private List<String> subjects;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "book_bookshelves", joinColumns = @JoinColumn(name = "book_id"))
     private List<String> bookshelves;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "book_languages", joinColumns = @JoinColumn(name = "book_id"))
     private List<String> languages;
+
     private Boolean copyright;
+
     @Column(name = "media_type")
     private String mediaType;
+
+    @Column(name = "download_count")
     private Integer downloadCount;
 
     public Book(BookData bookData) {
@@ -44,6 +53,10 @@ public class Book {
     }
 
     public Book() {
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getTitle() {

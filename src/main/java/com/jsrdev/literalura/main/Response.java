@@ -1,6 +1,6 @@
 package com.jsrdev.literalura.main;
 
-import com.jsrdev.literalura.BookRepository;
+import com.jsrdev.literalura.repository.BookRepository;
 import com.jsrdev.literalura.model.Book;
 import com.jsrdev.literalura.model.response.AuthorData;
 import com.jsrdev.literalura.model.response.BookData;
@@ -70,8 +70,11 @@ public class Response {
             bookList = ConvertResponseDataToBooks(data);
 
             bookList.forEach(book -> {
-                //Save in Db
-                repository.save(book);
+
+                if (repository.findBookById(book.getId()).isEmpty()) {
+                    //Save in Db
+                    repository.save(book);
+                } else System.out.println("El libro ya se encuentra la BD");
 
                 showBooks(book);
             });
@@ -97,15 +100,47 @@ public class Response {
     }
 
     public void getAuthors() {
-
+        /*
+        * Muestra:
+        * Author: Names
+        * Fecha de Nacimiento: fecha
+        * Fecha de Fallecimiento: Fecha
+        * Libros: List[libros]
+        *  */
     }
 
     public void getBirthYearAuthorsByYear() {
-
+        /*
+        * Ingrese el año vivo de autor(es) que desee buscar:
+        * 1600
+        *
+        * Muestra:
+        * Author: Names
+        * Fecha de Nacimiento: fecha
+        * Fecha de Fallecimiento: Fecha
+        * Libros: List[libros]
+        * */
     }
 
     public void getBooksByLanguage() {
-        var language = "es";
+
+        /*
+         * Ingrese el idioma para buscar los libros:
+         * es - español
+         * en - inglés
+         * fr - francés
+         * pt - portugués
+         *
+         * Muestra:
+         * Author: Names
+         * Fecha de Nacimiento: fecha
+         * Fecha de Fallecimiento: Fecha
+         * Libros: List[libros]
+         * */
+
+
+
+        /*var language = "es";
         String url = baseUrl + "books/?languages=" + language;
 
         var json = service.getData(url);
@@ -116,7 +151,7 @@ public class Response {
 
         System.out.println();
         System.out.println("-------- Libros encontrados del Idioma - " + language.toUpperCase() + "  ------------");
-        bookList.forEach(b -> System.out.println("Title: => " + b.getTitle()));
+        bookList.forEach(b -> System.out.println("Title: => " + b.getTitle())); */
     }
 
     private String encodeAndFormatBookName(String bookName) {
@@ -148,11 +183,11 @@ public class Response {
 
     private void showBooks(Book book) {
         System.out.println();
-        System.out.println("------------ LIBRO ----------------");
+        System.out.println("************************** LIBRO **************************");
         System.out.println("Title: " + book.getTitle());
         book.getAuthors().forEach(a -> System.out.println("Author: " + a.getName()));
         System.out.println("Language: " + book.getLanguages());
         System.out.println("Download count: " + book.getDownloadCount());
-        System.out.println("********************************");
+        System.out.println("***********************************************************");
     }
 }
